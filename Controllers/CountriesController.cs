@@ -21,16 +21,21 @@ namespace BookApiProject.Controllers
 
         //api/countries
         [HttpGet]
+        [ProducesResponseType(400)] // Helps when debugging
+        [ProducesResponseType(200, Type = typeof(IEnumerable<CountryDto>))] // Helps when debugging
         public IActionResult GetCountries() // Actions return IActionResult
         {
             var countries = _countryRepository.GetCountries().ToList();
+            // added validation check if valid, if invalid return 404 bad request
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
             // Created a new list to populate countries ID and Name properties
             var countriesDto = new List<CountryDto>();
             // Loop through countries list to populate ID and name to new list
             foreach(var country in countries)
             {
-                //each ideratrion will add each Id and Name to countriesDto List
+                //each ideratrion will add new countryDto Object with ID and Name
                 countriesDto.Add(new CountryDto
                 {
                     Id = country.Id,
@@ -38,10 +43,59 @@ namespace BookApiProject.Controllers
                 });
             }
 
-            return Ok(countries);
+            return Ok(countriesDto);
         }
 
+        //api/countries/countryId
+        [HttpGet("{countryId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]  // For Not Found response
+        [ProducesResponseType(200, Type = typeof(CountryDto))] 
+        public IActionResult GetCountry(int countryId)
+        {
+            if (!_countryRepository.CountryExists(countryId))
+                return NotFound();
 
+            var country = _countryRepository.GetCountry(countryId);
+          
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+           
+            var countryDto = new CountryDto() {
+
+                Id = country.Id,
+                Name = country.Name
+
+            };          
+
+            return Ok(countryDto);
+        }
+
+        //api/countries/authors/authorId
+        [HttpGet("authors/{authorId}")]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]  // For Not Found response
+        [ProducesResponseType(200, Type = typeof(CountryDto))]
+        public IActionResult GetCountryOfAnAuthor(int authorId)
+        {
+            // TO DO - Validate the Author exists
+
+
+            var country = _countryRepository.GetCountryOfAnAuthor(authorId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var countryDto = new CountryDto()
+            {
+                Id = country.Id,
+                Name = country.Name
+            };
+
+            return Ok(countryDto);
+        }
+
+        //TO DO GetAuthorsFromCountry
     }
 
 }
