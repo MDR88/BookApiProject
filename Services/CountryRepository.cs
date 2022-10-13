@@ -8,6 +8,7 @@ namespace BookApiProject.Services
 {
     public class CountryRepository : ICountryRepository
     {
+        // GET Methods
         private BookDbContext _countryContext;  // Brings in BookDbContext which impliments DbContext, Underscore indicates Private Variable
 
         public CountryRepository(BookDbContext countryContext) // Constructor brings instance of BookDbContext into class
@@ -15,6 +16,13 @@ namespace BookApiProject.Services
 
             _countryContext = countryContext; //Assigning to my variable
         }
+
+        // Input validation check to verify matching Id
+        public bool CountryExists(int countryId)
+        {
+            return _countryContext.Countries.Any(c => c.Id == countryId);
+        }
+
         public ICollection<Author> GetAuthorsFromACountry(int countryId)
         {
             return _countryContext.Authors.Where(c => c.Country.Id == countryId).ToList();

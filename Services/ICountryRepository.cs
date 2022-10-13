@@ -13,6 +13,6 @@ namespace BookApiProject.Services
         Country GetCountry(int countryId); // Return single country method with the single CountryId
         Country GetCountryOfAnAuthor(int authorId);  // Gets specific country for an Author Method
         ICollection<Author> GetAuthorsFromACountry(int countryId); // Retrieve all Authors from Specific Country
-
+        bool CountryExists(int countryId); // Input validation To confirm that the country exists 
     }
 }
