@@ -13,9 +13,9 @@ namespace BookApiProject.Controllers
     public class CountriesController : Controller
     {
         private ICountryRepository _countryRepository;  //Import/Inject the interface into the class, Because it's an interface need to instantiate concrete object.
-        public CountriesController(ICountryRepository countryRepository) 
+        public CountriesController(ICountryRepository countryRepository)
         {
-            _countryRepository = countryRepository;         
+            _countryRepository = countryRepository;
 
         }
 
@@ -30,10 +30,10 @@ namespace BookApiProject.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            // Created a new list to populate countries ID and Name properties
+            // Created a new list to populate countries ID and Name properties only
             var countriesDto = new List<CountryDto>();
             // Loop through countries list to populate ID and name to new list
-            foreach(var country in countries)
+            foreach (var country in countries)
             {
                 //each ideratrion will add new countryDto Object with ID and Name
                 countriesDto.Add(new CountryDto
@@ -50,23 +50,23 @@ namespace BookApiProject.Controllers
         [HttpGet("{countryId}")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]  // For Not Found response
-        [ProducesResponseType(200, Type = typeof(CountryDto))] 
+        [ProducesResponseType(200, Type = typeof(CountryDto))]
         public IActionResult GetCountry(int countryId)
         {
             if (!_countryRepository.CountryExists(countryId))
                 return NotFound();
 
             var country = _countryRepository.GetCountry(countryId);
-          
+
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
-           
+
             var countryDto = new CountryDto() {
 
                 Id = country.Id,
                 Name = country.Name
 
-            };          
+            };
 
             return Ok(countryDto);
         }
@@ -79,8 +79,6 @@ namespace BookApiProject.Controllers
         public IActionResult GetCountryOfAnAuthor(int authorId)
         {
             // TO DO - Validate the Author exists
-
-
             var country = _countryRepository.GetCountryOfAnAuthor(authorId);
 
             if (!ModelState.IsValid)
@@ -95,7 +93,36 @@ namespace BookApiProject.Controllers
             return Ok(countryDto);
         }
 
-        //TO DO GetAuthorsFromCountry
+        //api/countries/countryId/authors
+        [HttpGet("{countryId}/authors")]
+        [ProducesResponseType(200, Type = typeof (IEnumerable<AuthorDto>))]
+        [ProducesResponseType(404)]  // For Not Found response
+        [ProducesResponseType(400)]  // For Not Found response
+        public IActionResult GetAuthorsFromACountry(int countryId)
+        {
+            if (!_countryRepository.CountryExists(countryId))
+                return NotFound();
+            var authors = _countryRepository.GetAuthorsFromACountry(countryId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            var authorsDto = new List<AuthorDto>();
+
+            foreach (var author in authors)
+            {
+                authorsDto.Add(new AuthorDto 
+                {
+                Id = author.Id,
+                FirstName = author.FirstName,
+                LastName = author.LastName
+                
+                });
+            }
+
+            return Ok(authorsDto);
+
+        }
     }
 
 }
