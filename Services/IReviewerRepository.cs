@@ -6,13 +6,12 @@ using BookApiProject.Models;
 
 namespace BookApiProject.Services
 {
-    interface IReviewerRepository
+    public interface IReviewerRepository
     {
         ICollection<Reviewer> GetReviewers();
         Reviewer GetReviewer(int reviewerId);
-        ICollection<Review> GetReviews(int reviewId);
-        Reviewer GetReviewsByReviewer(int reviewerId);
-        Reviewer GetReviewerOfAReview(int reviewerId);
+        ICollection<Review> GetReviewsByReviewer(int reviewerId);
+        Reviewer GetReviewerOfAReview(int reviewId);
         bool ReviewerExists(int reviewerId);
 
     }
