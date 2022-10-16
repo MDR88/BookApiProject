@@ -15,9 +15,11 @@ namespace BookApiProject.Controllers
     public class CountriesController : Controller
     {
         private ICountryRepository _countryRepository;  //Import/Inject the interface into the class, Because it's an interface need to instantiate concrete object.
-        public CountriesController(ICountryRepository countryRepository)
+        private IAuthorRepository _authorRepository;
+        public CountriesController(ICountryRepository countryRepository, IAuthorRepository authorRepository)
         {
             _countryRepository = countryRepository;
+            _authorRepository = authorRepository;
 
         }
 
@@ -73,6 +75,7 @@ namespace BookApiProject.Controllers
             return Ok(countryDto);
         }
 
+        // TODO - Need to test after implementing IAuthor repo
         //api/countries/authors/authorId
         [HttpGet("authors/{authorId}")]
         [ProducesResponseType(400)]
@@ -80,7 +83,9 @@ namespace BookApiProject.Controllers
         [ProducesResponseType(200, Type = typeof(CountryDto))]
         public IActionResult GetCountryOfAnAuthor(int authorId)
         {
-            // TO DO - Validate the Author exists
+            if (!_authorRepository.AuthorExists(authorId))
+                return NotFound();
+
             var country = _countryRepository.GetCountryOfAnAuthor(authorId);
 
             if (!ModelState.IsValid)

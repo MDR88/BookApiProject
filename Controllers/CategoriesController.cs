@@ -13,10 +13,12 @@ namespace BookApiProject.Controllers
     public class CategoriesController : Controller
     {
         private ICategoryRepository _categoryRepository;
+        private IBookRepository _bookRepository;
 
-        public CategoriesController(ICategoryRepository categoryRepository)
+        public CategoriesController(ICategoryRepository categoryRepository, IBookRepository bookRepository)
         {
             _categoryRepository = categoryRepository;
+            _bookRepository = bookRepository;
         }
 
 
@@ -72,6 +74,7 @@ namespace BookApiProject.Controllers
             return Ok(categoryDto);
         }
 
+        // TOD -Need to test after implementing IBook repo
         //api/categories/books/bookId
         [HttpGet("books/{bookId}")]
         [ProducesResponseType(400)]
@@ -79,7 +82,8 @@ namespace BookApiProject.Controllers
         [ProducesResponseType(200, Type = typeof(IEnumerable<CategoryDto>))] // IEnumerable because returning list
         public IActionResult GetAllCategoriesForABook(int bookId)
         {
-            // TO DO - Validate the Book exists
+            if (!_bookRepository.BookExists(bookId))
+                return NotFound();
 
             var categories = _categoryRepository.GetAllCategoriesForABook(bookId);  // Returns List Of Categories that belong bookId and assigns to categories
 

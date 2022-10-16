@@ -6,7 +6,7 @@ using BookApiProject.Models;
 
 namespace BookApiProject.Services
 {
-    interface IReviewRepository
+   public interface IReviewRepository
     {
         ICollection<Review> GetReviews();
         Review GetReview(int reviewId);

@@ -6,7 +6,7 @@ using BookApiProject.Models;
 
 namespace BookApiProject.Services
 {
-    interface IAuthorRepository
+   public interface IAuthorRepository
     {
         ICollection<Author> GetAuthors();
         Author GetAuthor(int authorId);
