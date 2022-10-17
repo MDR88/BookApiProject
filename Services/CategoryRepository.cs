@@ -20,6 +20,18 @@ namespace BookApiProject.Services
             return _categoryContext.Categories.Any(c => c.Id == catergoryId);
         }
 
+        public bool CreateCategory(Category category)
+        {
+            _categoryContext.Add(category);
+            return Save();
+        }
+
+        public bool DeleteCategory(Category category)
+        {
+            _categoryContext.Remove(category);
+            return Save();
+        }
+
         public ICollection<Book> GetAllBooksForCategory(int categoryId)
         {
             return _categoryContext.BookCategories.Where(c => c.CategoryId == categoryId).Select(b => b.Book).ToList();
@@ -45,6 +57,18 @@ namespace BookApiProject.Services
             var category = _categoryContext.Categories.Where(c => c.Name.Trim().ToUpper() == categoryName && c.Id != categoryId);  
 
             return category == null ? false : true;
+        }
+
+        public bool Save()
+        {
+            var saved = _categoryContext.SaveChanges();
+            return saved >= 0 ? true : false;
+        }
+
+        public bool UpdateCategory(Category category)
+        {
+            _categoryContext.Update(category);
+            return Save();
         }
     }
 }

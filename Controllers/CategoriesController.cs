@@ -1,4 +1,5 @@
 ﻿using BookApiProject.Dtos;
+using BookApiProject.Models;
 using BookApiProject.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -49,7 +50,7 @@ namespace BookApiProject.Controllers
         }
 
         //api/categories/categoryId
-        [HttpGet("{categoryId}")]
+        [HttpGet("{categoryId}", Name ="GetCategory")]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]  // For Not Found response
         [ProducesResponseType(200, Type = typeof(CategoryDto))]
@@ -135,7 +136,38 @@ namespace BookApiProject.Controllers
             }
 
             return Ok(booksDto);
+        }
+        //api/catefories
+        [HttpPost]
+        [ProducesResponseType(201, Type = typeof(Category))] // Created Ok 
+        [ProducesResponseType(400)]  // Bad Request
+        [ProducesResponseType(422)]  // Unprocessable Entity
+        [ProducesResponseType(500)]  // Server Error
+        public IActionResult CreateCategory([FromBody] Category categoryToCreate)
+        {
+            if (categoryToCreate == null)
+                return BadRequest(ModelState);
 
+            var category = _categoryRepository.GetCategories()
+                .Where(c => c.Name.Trim().ToUpper() == categoryToCreate.Name.Trim().ToUpper())
+                .FirstOrDefault(); //Check for duplicate
+
+            if (category != null)
+            {
+                ModelState.AddModelError("", $"Category {categoryToCreate.Name} already exists");
+                return StatusCode(422, ModelState);  //Unprocessable Entity, also returning ModelState for debugging
+            }
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_categoryRepository.CreateCategory(categoryToCreate))
+            {
+                ModelState.AddModelError("", $"Something went wrong saving {categoryToCreate.Name} already exists");
+                return StatusCode(500, ModelState); // Server error
+            }
+
+            return CreatedAtRoute("GetCountry", new { countryId = categoryToCreate.Id }, categoryToCreate);  //Created new countryId matching newly created Id of the object
         }
 
     }

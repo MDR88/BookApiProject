@@ -16,5 +16,10 @@ namespace BookApiProject.Services
 
         bool CategoryExists(int catergoryId); // Input validation
         bool IsDuplicateCategoryName(int categoryId, string categoryName);
+
+        bool CreateCategory(Category category);
+        bool UpdateCategory(Category category);
+        bool DeleteCategory(Category category);
+        bool Save();
     }
 }
