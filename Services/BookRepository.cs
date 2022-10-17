@@ -45,7 +45,7 @@ namespace BookApiProject.Services
             return ((decimal)reviews.Sum(r => r.Rating) / reviews.Count()); //If there are reviews, average all ratings for it. Divide by the count in reviews.
         }
 
-        public ICollection<Book> GetBooks(int bookId)
+        public ICollection<Book> GetBooks()
         {
             return _bookDbContext.Books.OrderBy(b => b.Title).ToList();
         }

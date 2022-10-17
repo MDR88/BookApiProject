@@ -8,7 +8,7 @@ namespace BookApiProject.Services
 {
     public interface IBookRepository
     {
-        ICollection<Book> GetBooks(int bookId);
+        ICollection<Book> GetBooks();
         Book GetBook(int bookId);
         Book GetBook(string bookIsbn);
         decimal GetBookRating(int bookId);
