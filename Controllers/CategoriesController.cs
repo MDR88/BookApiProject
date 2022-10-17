@@ -73,8 +73,7 @@ namespace BookApiProject.Controllers
 
             return Ok(categoryDto);
         }
-
-        // TOD -Need to test after implementing IBook repo
+        
         //api/categories/books/bookId
         [HttpGet("books/{bookId}")]
         [ProducesResponseType(400)]

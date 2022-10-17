@@ -40,7 +40,14 @@ namespace BookApiProject.Services
 
         public Country GetCountryOfAnAuthor(int authorId)
         {
-            return _countryContext.Authors.Where(a => a.Id == authorId).Select(c => c.Country).FirstOrDefault(); // Selects AuthorID in Authors, select to get the country that belongs to Author.
+            return _countryContext.Authors.Where(a => a.Id == authorId).Select(c => c.Country).FirstOrDefault();
+        }
+
+        public bool IsDuplicateCountryName(int countryId, string countryName)
+        {
+            var country = _countryContext.Countries.Where(c => c.Name.Trim().ToUpper() == countryName && c.Id != countryId);  
+
+            return country == null ? false : true;
         }
     }
 }

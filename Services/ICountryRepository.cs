@@ -9,10 +9,11 @@ namespace BookApiProject.Services
     
     public interface ICountryRepository
     {
-        ICollection<Country> GetCountries(); //Returning all countries
-        Country GetCountry(int countryId); // Return single country
-        Country GetCountryOfAnAuthor(int authorId);  // Gets specific country for an Author Method
-        ICollection<Author> GetAuthorsFromACountry(int countryId); // Retrieve all Authors from Specific Country
-        bool CountryExists(int countryId); // Input validation To confirm that the country exists 
+        ICollection<Country> GetCountries();
+        Country GetCountry(int countryId);
+        Country GetCountryOfAnAuthor(int authorId);
+        ICollection<Author> GetAuthorsFromACountry(int countryId);
+        bool CountryExists(int countryId); // Input validation
+        bool IsDuplicateCountryName(int countryId, string countryName);
     }
 }

@@ -14,6 +14,7 @@ namespace BookApiProject.Services
         ICollection<Category> GetAllCategoriesForABook(int bookId); // Gets specific category for book
         ICollection<Book> GetAllBooksForCategory(int categoryId); // retrieve all book categories from specific books
 
-        bool CategoryExists(int catergoryId); // Input validation To confirm that the country exists
+        bool CategoryExists(int catergoryId); // Input validation
+        bool IsDuplicateCategoryName(int categoryId, string categoryName);
     }
 }

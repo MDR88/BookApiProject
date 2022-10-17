@@ -16,9 +16,10 @@ namespace BookApiProject.Controllers
     {
         private IAuthorRepository _authorRepository;
         private IBookRepository _bookRepository;
-        public AuthorsController(IAuthorRepository authorRepository, IBookRepository _bookRepository)
+        public AuthorsController(IAuthorRepository authorRepository, IBookRepository bookRepository)
         {
             _authorRepository = authorRepository;
+            _bookRepository = bookRepository;
         }
         //api/authors
         [HttpGet]
@@ -101,8 +102,7 @@ namespace BookApiProject.Controllers
             return Ok(booksDto);
 
         }
-
-        // TO DO - Retest this action after Book interface is implemented. 
+         
         //api/authors/books/bookId
         [HttpGet("books/{bookId}")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<AuthorDto>))]
@@ -113,16 +113,15 @@ namespace BookApiProject.Controllers
             if (!_bookRepository.BookExists(bookId))
                 return NotFound();
 
-
             var authors = _authorRepository.GetAuthorsOfABook(bookId);
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var authorDto = new List<AuthorDto>();
+            var authorsDto = new List<AuthorDto>();
             foreach (var author in authors)
             {
-                authorDto.Add(new AuthorDto
+                authorsDto.Add(new AuthorDto
                 {
                     Id = author.Id,
                     FirstName = author.FirstName,
@@ -130,7 +129,7 @@ namespace BookApiProject.Controllers
                 });
 
             }
-            return Ok(authorDto);
+            return Ok(authorsDto);
 
         }
     }

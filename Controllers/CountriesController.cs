@@ -74,8 +74,7 @@ namespace BookApiProject.Controllers
 
             return Ok(countryDto);
         }
-
-        // TODO - Need to test after implementing IAuthor repo
+        
         //api/countries/authors/authorId
         [HttpGet("authors/{authorId}")]
         [ProducesResponseType(400)]
