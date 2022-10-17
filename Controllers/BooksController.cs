@@ -100,5 +100,21 @@ namespace BookApiProject.Controllers
             };
             return Ok(bookDto);
         }
+
+        //api/books/bookId/rating
+        [HttpGet("{bookId}/rating")]
+        [ProducesResponseType(200, Type = typeof(decimal))]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
+        public IActionResult GetBookRating(int bookId)
+        {
+            if (!_bookRepository.BookExists(bookId))
+
+                return NotFound();
+
+            var rating = _bookRepository.GetBookRating(bookId);
+            return Ok(rating);
+        }
+
     }
 }
