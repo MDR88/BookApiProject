@@ -1,4 +1,5 @@
 ﻿using BookApiProject.Dtos;
+using BookApiProject.Models;
 using BookApiProject.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -51,7 +52,7 @@ namespace BookApiProject.Controllers
         }
 
         //api/reviews/reviewId
-        [HttpGet("{reviewId}")]
+        [HttpGet("{reviewId}",Name = "GetReview")]
         [ProducesResponseType(200, Type = typeof(ReviewDto))]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -62,7 +63,7 @@ namespace BookApiProject.Controllers
 
                 return NotFound();
 
-            var review = _reviewRepository.GetReview(reviewId);  // Calling repo, if not valid return bad request
+            var review = _reviewRepository.GetReview(reviewId); 
 
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -131,6 +132,106 @@ namespace BookApiProject.Controllers
             };
 
             return Ok(bookDto);
+        }
+
+        //api/reviews
+        [HttpPost]
+        [ProducesResponseType(201, Type = typeof(Review))] // Created Ok 
+        [ProducesResponseType(400)]  // Bad Request
+        [ProducesResponseType(404)]  // Book not found
+        [ProducesResponseType(500)]  // Server Error
+        public IActionResult CreateReview([FromBody] Review reviewToCreate)
+        {
+            if (reviewToCreate == null)
+                return BadRequest(ModelState);
+
+            if (!_reviewerRepository.ReviewerExists(reviewToCreate.Reviewer.Id))
+                ModelState.AddModelError("", "Reviewer doesn't exist!");
+
+            if (!_bookRepository.BookExists(reviewToCreate.Book.Id))
+                ModelState.AddModelError("", "Book doesn't exist!");
+
+            if (!ModelState.IsValid)
+                return StatusCode(404, ModelState);
+
+            reviewToCreate.Book = _bookRepository.GetBook(reviewToCreate.Reviewer.Id);
+            reviewToCreate.Reviewer = _reviewerRepository.GetReviewer(reviewToCreate.Reviewer.Id);
+
+            if (!_reviewRepository.CreateReview(reviewToCreate))
+            {
+                ModelState.AddModelError("", $"Something went wrong saving the review.");
+                return StatusCode(500, ModelState); 
+            }
+
+            return CreatedAtRoute("GetReview", new { reviewId = reviewToCreate.Id }, reviewToCreate);  //Created new categoryId matching newly created Id of the object
+        }
+
+        //api/reviews/reviewId
+        [HttpPut("{reviewId}")]
+        [ProducesResponseType(204, Type = typeof(Review))] // No Content
+        [ProducesResponseType(400)]  // Bad Request
+        [ProducesResponseType(404)]  // Book not found
+        [ProducesResponseType(500)]  // Server Error
+        public IActionResult UpdateReview(int reviewId, [FromBody] Review reviewToUpdate)
+        {
+            if (reviewToUpdate == null)
+                return BadRequest(ModelState);
+
+            if (reviewId != reviewToUpdate.Id)
+                return BadRequest(ModelState);
+
+            if(!_reviewRepository.ReviewExists(reviewId))
+                ModelState.AddModelError("", "Review doesn't exist!");
+
+            if (!_reviewerRepository.ReviewerExists(reviewToUpdate.Reviewer.Id))
+                ModelState.AddModelError("", "Reviewer doesn't exist!");
+
+            if (!_reviewerRepository.ReviewerExists(reviewToUpdate.Book.Id))
+                ModelState.AddModelError("", "Book doesn't exist!");           
+
+            if (!ModelState.IsValid)
+                return StatusCode(404, ModelState);
+
+            reviewToUpdate.Book = _bookRepository.GetBook(reviewToUpdate.Book.Id);
+            reviewToUpdate.Reviewer = _reviewerRepository.GetReviewer(reviewToUpdate.Reviewer.Id);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewRepository.UpdateReview(reviewToUpdate))
+            {
+                ModelState.AddModelError("", $"Something went wrong saving the review.");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();  //Created new categoryId matching newly created Id of the object
+        }
+
+
+        //api/reviews/reviewId
+        [HttpDelete("{reviewId}")]
+        [ProducesResponseType(204)]  //No Content
+        [ProducesResponseType(400)]  // Bad Request
+        [ProducesResponseType(404)]  // Not Found
+        [ProducesResponseType(409)]  // Conflict
+        [ProducesResponseType(500)]  // Server Error
+        public IActionResult DeleteReview(int reviewId)
+        {
+            if (!_reviewRepository.ReviewExists(reviewId))
+                return NotFound();
+
+            var reviewToDelete = _reviewRepository.GetReview(reviewId);
+
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewRepository.DeleteReview(reviewToDelete))
+            {
+                ModelState.AddModelError("", $"Something went wrong deleting review.");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
         }
 
     }

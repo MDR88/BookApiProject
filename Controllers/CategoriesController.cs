@@ -167,7 +167,7 @@ namespace BookApiProject.Controllers
                 return StatusCode(500, ModelState); // Server error
             }
 
-            return CreatedAtRoute("GetCountry", new { countryId = categoryToCreate.Id }, categoryToCreate);  //Created new categoryId matching newly created Id of the object
+            return CreatedAtRoute("GetCategory", new { categoryId = categoryToCreate.Id }, categoryToCreate);  //Created new categoryId matching newly created Id of the object
         }
 
         //api/categories/categoryId
@@ -190,7 +190,7 @@ namespace BookApiProject.Controllers
 
             if (_categoryRepository.IsDuplicateCategoryName(categoryId, updatedCategoryInfo.Name))
             {
-                ModelState.AddModelError("", $"Country {updatedCategoryInfo.Name} already exists");
+                ModelState.AddModelError("", $"Category {updatedCategoryInfo.Name} already exists");
                 return StatusCode(422, ModelState);
             }
             if (!ModelState.IsValid)

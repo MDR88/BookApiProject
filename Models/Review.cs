@@ -26,7 +26,7 @@ namespace BookApiProject.Models
         [Range(1,5,ErrorMessage ="Rating must be between 1 and 5 stars")]
         public int Rating { get; set; }
 
-        public virtual Reviewer Reviewer { get; set; }  // Single Navigational Property
-        public virtual Book Book { get; set; }  // Single Navigational Property
+        public virtual Reviewer Reviewer { get; set; }  
+        public virtual Book Book { get; set; }
     }
 }
