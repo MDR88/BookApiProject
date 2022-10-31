@@ -1,4 +1,5 @@
 ﻿using BookApiProject.Dtos;
+using BookApiProject.Models;
 using BookApiProject.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -46,8 +47,8 @@ namespace BookApiProject.Controllers
             return Ok(reviewersDto);
         }
 
-        //api/reviewer/reviewerId
-        [HttpGet("{reviewerId}")]
+        //api/reviewers/reviewerId
+        [HttpGet("{reviewerId}", Name = "GetReviewer")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<ReviewerDto>))]
         [ProducesResponseType(400)]
         [ProducesResponseType(404)]
@@ -126,6 +127,59 @@ namespace BookApiProject.Controllers
             };
 
             return Ok(reviewerDto);
+        }
+
+        //api/reviewers
+        [HttpPost]
+        [ProducesResponseType(201, Type = typeof(Reviewer))] // Created Ok 
+        [ProducesResponseType(400)]  // Bad Request        
+        [ProducesResponseType(500)]  // Server Error
+        public IActionResult CreateReviewer([FromBody] Reviewer reviewerToCreate)
+        {
+            if (reviewerToCreate == null)
+                return BadRequest(ModelState);  
+            
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewerRepository.CreateReviewer(reviewerToCreate))
+            {
+                ModelState.AddModelError("", $"Something went wrong saving " + 
+                                            $"{reviewerToCreate.FirstName} {reviewerToCreate.LastName} already exists");
+                return StatusCode(500, ModelState); // Server error
+            }
+
+            return CreatedAtRoute("GetReviewer", new { reviewerId = reviewerToCreate.Id }, reviewerToCreate);
+        }
+
+        //api/reviewers/reviewerId
+        [HttpPut("{reviewerId}")]
+        [ProducesResponseType(204)]  //No Content
+        [ProducesResponseType(400)]  // Bad Request
+        [ProducesResponseType(404)]  // Not Found        
+        [ProducesResponseType(500)]  // Server Error
+        public IActionResult UpdateReviewer(int reviewerId, [FromBody] Reviewer updatedReviewerInfo)
+        {
+            if (updatedReviewerInfo == null)
+                return BadRequest(ModelState);
+
+            if (reviewerId != updatedReviewerInfo.Id)  
+                return BadRequest(ModelState);
+
+            if (!_reviewerRepository.ReviewerExists(reviewerId))
+                return NotFound();
+           
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewerRepository.UpdateReviewer(updatedReviewerInfo))
+            {
+                ModelState.AddModelError("", $"Something went wrong updating " +
+                                           $"{updatedReviewerInfo.FirstName} {updatedReviewerInfo.LastName}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
         }
     }
 }
