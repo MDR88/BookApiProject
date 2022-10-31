@@ -181,5 +181,39 @@ namespace BookApiProject.Controllers
 
             return NoContent();
         }
+
+        //api/reviewers/reviewerId
+        [HttpDelete("{reviewerId}")]
+        [ProducesResponseType(204)]  //No Content
+        [ProducesResponseType(400)]  // Bad Request
+        [ProducesResponseType(404)]  // Not Found       
+        [ProducesResponseType(500)]  // Server Error
+        public IActionResult DeleteReviewer(int reviewerId)
+        {
+            if (!_reviewerRepository.ReviewerExists(reviewerId))
+                return NotFound();
+
+            var reviewerToDelete = _reviewerRepository.GetReviewer(reviewerId);
+            var reviewsToDelete = _reviewerRepository.GetReviewsByReviewer(reviewerId);
+            
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            if (!_reviewerRepository.DeleteReviewer(reviewerToDelete))
+            {
+                ModelState.AddModelError("", $"Something went wrong deleting " +
+                                             $"{reviewerToDelete.FirstName} {reviewerToDelete.LastName}");
+                return StatusCode(500, ModelState);
+            }
+
+            if (!_reviewRepository.DeleteReviews(reviewsToDelete.ToList()))
+            {
+                ModelState.AddModelError("", $"Something went wrong deleting reviews by" +
+                                             $"{reviewerToDelete.FirstName} {reviewerToDelete.LastName}");
+                return StatusCode(500, ModelState);
+            }
+
+            return NoContent();
+        }
     }
 }
